@@ -1,15 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Events;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
-public class TapHeartModuleComponent : MonoBehaviour
+public class TapIntermitenteModuleComponent : MonoBehaviour
 {
     #region variables
     [SerializeField] PlayTappingMinigameComponent playTappingMinigameComponent;
     [SerializeField] Animator animatorModuleCanvas;
-    [SerializeField] Slider sliderHealth;
+    [SerializeField] RectTransform originalHealth;
+    [SerializeField] RectTransform copyHealth;
     [SerializeField] Button btnAction;
     int timer;
 
@@ -19,12 +21,20 @@ public class TapHeartModuleComponent : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        btnAction.gameObject.GetComponent<RectTransform>().sizeDelta = copyHealth.sizeDelta;
+        alcance = (int)(originalHealth.sizeDelta.x - 40f);
+        //anchord de copia en 0.5 en 4
         OpenModule();
-        AddListenerAction(btnAction, delegate 
+        //StartCoroutine(GoAction());
+        AddListenerAction(btnAction, delegate
         {
             StartCoroutine(GoAction());
         });
     }
+    //private void Update()
+    //{
+    //    GoAction();
+    //}
     #endregion
     #region metodos publicos
     void AddListenerAction(Button button, UnityAction action)
@@ -34,24 +44,29 @@ public class TapHeartModuleComponent : MonoBehaviour
     void OpenModule()
     {
         //instanciar segun dificultad
-        StartCoroutine(Cronometro());
+        //StartCoroutine(Cronometro());
+        StartCoroutine(HeartScale());
     }
+    public IEnumerator HeartScale()
+    {
+        while (copyHealth.sizeDelta.x >= 0)
+        {
+            copyHealth.sizeDelta -= new Vector2(1,0)/2;
+            yield return null;
+        }
+    }
+    int alcance;
     public IEnumerator GoAction()
     {
-        if (timer <= PlayTappingMinigameComponent.ModuleTapTimer)
+        Debug.Log("copyHealth: " + copyHealth.sizeDelta.x + "alcance: " + alcance);
+        if ((int)copyHealth.sizeDelta.x >= alcance && (int)copyHealth.sizeDelta.x <= (originalHealth.sizeDelta.x + 30))
         {
-            //suma slider
-            sliderHealth.value = sliderHealth.value <= PlayTappingMinigameComponent.TapHeartPtsMax ? sliderHealth.value += PlayTappingMinigameComponent.TapHeartPtsAddition : PlayTappingMinigameComponent.TapHeartPtsMax;
-
-            if (sliderHealth.value == PlayTappingMinigameComponent.TapHeartPtsMax)
-            {
-                PlayTappingMinigameComponent.HealthHUB(true);
-                gameObject.SetActive(false);
-            }
+            Debug.Log("EXCATS");
+            gameObject.SetActive(false);
         }
-        
         yield return null;
     }
+    #endregion
     #region metodos privados
     private IEnumerator Cronometro()
     {
@@ -72,6 +87,5 @@ public class TapHeartModuleComponent : MonoBehaviour
             StartCoroutine(Cronometro());
         }
     }
-    #endregion
     #endregion
 }

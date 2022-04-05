@@ -8,7 +8,7 @@ public class PlayTappingMinigameComponent : MonoBehaviour
     [Header("Manager Data")]
     [SerializeField] int cantModulos;
     [SerializeField] difficulty selectedDifficulty = difficulty.Easy;
-    [SerializeField] modulos selectedmodule = modulos.tapRepetido;
+    modulos selectedmodule;
     private minigameMode selectedMode = minigameMode.Single;
 
     [Header("Texto de introduccion")]
@@ -75,8 +75,10 @@ public class PlayTappingMinigameComponent : MonoBehaviour
             case difficulty.VeryEasy:
                 selectedMode = minigameMode.Single;
                 selectedmodule = modulos.tapRepetido;
+                GetModuleData();
                 selectedmodule = modulos.tapProlongado;
                 GetModuleData();
+
                 break;
             case difficulty.Easy:
                 selectedMode = minigameMode.Single;
@@ -109,15 +111,15 @@ public class PlayTappingMinigameComponent : MonoBehaviour
                 tapHeartPtsSustract = .1f;
                 tapHeartPtsAddition = .1f;
                 PtsHUB = .2f;
-                ModuleTapTimer = 3f;
+                ModuleTapTimer = 5f;
                 break;
             case modulos.tapProlongado:
-                TapProPtsMax = 1f;
+                TapProPtsMax = 1;
                 TapProPtsMin = 0;
                 TapProPtsSustract = .1f;
                 TapProPtsAddition = .1f;
                 PtsHUB = .2f;
-                ModuleTapProTimer = 100f;
+                ModuleTapProTimer = 5f;
                 break;
             case modulos.tapIntermitente:
                 Debug.Log("");
@@ -125,6 +127,20 @@ public class PlayTappingMinigameComponent : MonoBehaviour
             case modulos.tapArrastrar:
                 Debug.Log("");
                 break;
+        }
+    }
+    int timer; int i;
+    private IEnumerator Cronometro(int cantMecanicas, float tiempoInstancia)
+    {
+        yield return new WaitForSeconds(tiempoInstancia);
+        i++;
+        if (i <= cantMecanicas)
+        {
+            Debug.Log("crear instancia");
+        }
+        else
+        {
+            StopCoroutine(Cronometro(0,0));
         }
     }
     public float PtsHUB;
