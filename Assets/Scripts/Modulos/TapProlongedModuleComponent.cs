@@ -40,56 +40,48 @@ public class TapProlongedModuleComponent : MonoBehaviour, IPointerDownHandler, I
         else
         {
             timer += 1;
-            Debug.Log("tp es: " + timer);
+            Debug.Log("tp de M_Prolonge es: " + timer);
             StartCoroutine(Cronometro());
         }
     }
     #endregion
     #region metodos publicos
+    bool down, up;
     public void OnPointerDown(PointerEventData eventData)
     {
-        StartCoroutine(GoAction(true));
+        up = false;
+        down = true;
+        StartCoroutine(GoDown());
     }
     public void OnPointerUp(PointerEventData eventData)
     {
-        StartCoroutine(GoAction(false));
+        down = false;
+        up = true;
+        StartCoroutine(GoUp());
     }
-    public IEnumerator GoAction(bool addition)
+    public IEnumerator GoDown()
     {
-        while (timer <= PlayTappingMinigameComponent.ModuleTapProTimer)
+        while (down)
         {
-            if (addition)
+            if (sliderHealth.value < playTappingMinigameComponent.TapProPtsMax)
             {
-                if (sliderHealth.value >= playTappingMinigameComponent.TapProPtsMax)
-                {
-                    //StopCoroutine(GoAction(true));
-                    break;
-                }
-                else 
-                {
-                    sliderHealth.value += (playTappingMinigameComponent.TapProPtsAddition / 50);
-                }
-               // if (sliderHealth.value == //PlayTappingMinigameComponent.TapProPtsMax)
-               // {
-               //     PlayTappingMinigameComponent.HealthHUB(true);
-               //     gameObject.SetActive(false);
-               // }
-                Debug.Log("+=");
+                sliderHealth.value += (playTappingMinigameComponent.TapProPtsAddition / 50);
             }
-            else
+            if (sliderHealth.value == PlayTappingMinigameComponent.TapProPtsMax)
             {
-                
-                Debug.Log("-=");
-                if (sliderHealth.value <= playTappingMinigameComponent.TapProPtsMin)
-                {
-                    //StopCoroutine(GoAction(false));
-                    break;
-                }
-                else 
-                {
-                    sliderHealth.value -= (playTappingMinigameComponent.TapProPtsSustract * 0.2f);
-                    Debug.Log("0.2f");
-                }
+                PlayTappingMinigameComponent.HealthHUB(true);
+                gameObject.SetActive(false);
+            }
+            yield return null;
+        }
+    }
+    public IEnumerator GoUp()
+    {
+        while (up)
+        {
+            if (sliderHealth.value > playTappingMinigameComponent.TapProPtsMin)
+            {
+                sliderHealth.value -= (playTappingMinigameComponent.TapProPtsSustract / 50);
             }
             yield return null;
         }
